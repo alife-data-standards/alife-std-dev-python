@@ -11,4 +11,4 @@ install:
 script:
   - pytest --cov=ALifeStdDev
   - coverage xml
-- python-codacy-coverage -r coverage.xml
+  - python-codacy-coverage -r coverage.xml
