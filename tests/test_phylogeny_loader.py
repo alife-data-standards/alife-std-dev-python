@@ -3,7 +3,7 @@ import pytest
 
 def test_load_phylogeny_to_networkx():
     phylo = alsd.load_phylogeny_to_networkx("example_data/asexual_phylogeny_test.csv")
-    
+
     assert phylo.has_node(36210211)
     assert phylo.has_node(36205850)
     assert phylo.has_edge(36205850, 36210211)

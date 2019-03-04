@@ -34,7 +34,7 @@ def load_phylogeny_to_networkx(filename):
             try:
                 ancestor = int(ancestor)
                 if phylogeny.has_node(ancestor):
-                    phylogeny.add_edge(ancestor, taxon_id)    
+                    phylogeny.add_edge(ancestor, taxon_id)
                 else:
                     raise Exception(f"{taxon_id}'s ancestor, {ancestor}, is not in this file.")
 
