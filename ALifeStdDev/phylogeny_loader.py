@@ -2,6 +2,7 @@ import networkx as nx
 import pandas as pd
 import ast
 
+
 def load_phylogeny_to_networkx(filename):
     """
     Loads a phylogeny in standards format (in csv or json) from the file
@@ -12,33 +13,39 @@ def load_phylogeny_to_networkx(filename):
     Example: `my_phylogeny.nodes["A"]["origin"]` would return the origin of
     node "A"
     """
+
+    # A phylogeny is a directed graph
     phylogeny = nx.DiGraph()
 
-    if filename.endswith(".csv"):
+    if filename.endswith(".csv"):  # Handle CSV files
         data = pd.read_csv(filename)
-        data.loc[:,"ancestor_list"] = data.loc[:,"ancestor_list"].apply(ast.literal_eval)
+        # The ancestor_list column contains a string of lists of strings
+        # Let's turn it into an actual list of strings
+        data.loc[:, "ancestor_list"] = \
+            data.loc[:, "ancestor_list"].apply(ast.literal_eval)
         data.set_index("id", inplace=True)
-    elif filename.endswith(".json"):
+    elif filename.endswith(".json"):  # Handle JSON files
         data = pd.read_json(filename, orient="index", convert_dates=False)
-
-    # print(data)
 
     # Have to do this in two passes, (one to add nodes, one to
     # add eges) because order in file is not required/guaranteed
+
+    # Add nodes
     for taxon_id in data.index:
         phylogeny.add_node(taxon_id)
 
+    # Add edges
     for taxon_id in data.index:
 
         for ancestor in data.loc[taxon_id, "ancestor_list"]:
-            try:
+            try:  # Conversion to int will fail if its a special value
                 ancestor = int(ancestor)
                 if phylogeny.has_node(ancestor):
                     phylogeny.add_edge(ancestor, taxon_id)
                 else:
                     raise Exception(f"{taxon_id}'s ancestor, {ancestor}, is not in this file.")
 
-            except ValueError:
+            except ValueError:  # Handle special values
                 phylogeny.nodes[taxon_id]["origin"] = ancestor
 
     return phylogeny
