@@ -38,7 +38,7 @@ def load_phylogeny_to_networkx(filename):
                 else:
                     raise Exception(f"{taxon_id}'s ancestor, {ancestor}, is not in this file.")
 
-            except ValueError as e:
+            except ValueError:
                 phylogeny.nodes[taxon_id]["origin"] = ancestor
 
     return phylogeny
