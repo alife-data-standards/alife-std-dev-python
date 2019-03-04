@@ -16,10 +16,12 @@ def load_phylogeny_to_networkx(filename):
 
     if filename.endswith(".csv"):
         data = pd.read_csv(filename)
+        data.loc[:,"ancestor_list"] = data.loc[:,"ancestor_list"].apply(ast.literal_eval)
+        data.set_index("id", inplace=True)
     elif filename.endswith(".json"):    
-        data = pd.read_json(filename)
+        data = pd.read_json(filename, orient="index", convert_dates=False)
 
-    data.set_index("id", inplace=True)
+    # print(data)
 
     # Have to do this in two passes, (one to add nodes, one to
     # add eges) because order in file is not required/guaranteed
@@ -27,9 +29,8 @@ def load_phylogeny_to_networkx(filename):
         phylogeny.add_node(id)
 
     for id in data.index:
-        ancestors = ast.literal_eval(data.loc[id, "ancestor_list"])
 
-        for ancestor in ancestors:
+        for ancestor in data.loc[id, "ancestor_list"]:
             try:
                 ancestor = int(ancestor)
                 if phylogeny.has_node(ancestor):
@@ -38,6 +39,6 @@ def load_phylogeny_to_networkx(filename):
                     raise Exception(f"{id}'s ancestor, {ancestor}, is not in this file.")
 
             except ValueError as e:
-                phylogeny.nodes[id]["origin"] = ancestors[0]
+                phylogeny.nodes[id]["origin"] = ancestor
 
     return phylogeny
