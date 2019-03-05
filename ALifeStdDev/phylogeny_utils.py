@@ -2,8 +2,15 @@ import networkx as nx
 
 # ===== Verification =====
 def all_taxa_have_attribute(phylogeny, attribute):
-    """
-    Do all taxa in phylogeny have given attribute?
+    """Do all taxa in the given phylogeny have the given attribute?
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        attribute (str): a possible attribute/descriptor for a taxa (node) in phylogeny
+
+    Returns:
+        True if all taxa (nodes) in the phylogeny have the given attribute and False
+        otherwise.
     """
     for node in phylogeny.nodes:
         if not (attribute in phylogeny.nodes[node]): return False
@@ -57,7 +64,7 @@ def get_independent_phylogenies(phylogeny):
 
 # ===== Extracting the extant taxa =====
 
-def get_extant_taxa_from_pruned(phylogeny):
+def get_leaf_taxa(phylogeny):
     """
     given a phylogeny, return extant population details (as a dictionary) indexed
     by id
@@ -66,14 +73,14 @@ def get_extant_taxa_from_pruned(phylogeny):
     for e in extant: extant[e]["id"] = e
     return extant
 
-def get_extant_taxa_ids_from_pruned(phylogeny):
+def get_leaf_taxa_ids(phylogeny):
     """
     given a phylogeny, return ids of extant taxa
     """
     extant_ids = [node for node in phylogeny.nodes if len(list(phylogeny.successors(node))) == 0]
     return extant_ids
 
-def get_extant_taxa_ids_by_destruction_time(phylogeny, not_destroyed_value="none"):
+def get_extant_taxa_ids(phylogeny, not_destroyed_value="none"):
     """
     given a phylogeny, return ids of extant taxa (i.e., taxa where destruction_time is equal
     to given not_destroyed_value)
@@ -83,7 +90,7 @@ def get_extant_taxa_ids_by_destruction_time(phylogeny, not_destroyed_value="none
     extant_ids = [node for node in phylogeny.nodes if phylogeny.nodes[node]["destruction_time"]==not_destroyed_value]
     return extant_ids
 
-def get_extant_taxa_by_destruction_time(phylogeny, not_destroyed_value="none"):
+def get_extant_taxa(phylogeny, not_destroyed_value="none"):
     """
     given a phylogeny, return extant population details (as a dictionary) indexed
     by id
