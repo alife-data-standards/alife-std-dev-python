@@ -17,13 +17,20 @@ def all_taxa_have_attribute(phylogeny, attribute):
     return True
 
 def is_asexual(phylogeny):
-    """
-    is this phylogeny asexual?
+    """Is this an asexual phylogeny?
+
+    A phylogeny is considered to be asexual if all taxa (nodes) have a single direct
+    ancestor (predecessor).
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        True if the phylogeny is asexual and False otherwise.
     """
     for node in phylogeny.nodes:
         if len(list(phylogeny.predecessors(node))) > 1: return False
     return True
-
 
 # ===== Rootedness-related utilities =====
 
