@@ -22,7 +22,7 @@ def test_is_asexual():
 
     # assert that asexual phylogeny is asexual
     assert phylo.is_asexual(asex_phylogeny)
-    assert phylo.is_asexual(sex_phylogeny)
+    assert not phylo.is_asexual(sex_phylogeny)
 
 
 if __name__ == "__main__":
