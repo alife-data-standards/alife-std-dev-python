@@ -224,12 +224,12 @@ def taxon_is_alive(node, time, not_destroyed_value="none",
                  node[origin_attribute] < time)  # has been born
 
 
-def validate_destruction_time(phylogeny, attribute):
+def validate_destruction_time(phylogeny, attribute="destruction_time"):
     if (not all_taxa_have_attribute(phylogeny, attribute)):
         raise Exception(f"Not all taxa have '{attribute}' data")
 
 
-def validate_origin_time(phylogeny, attribute):
+def validate_origin_time(phylogeny, attribute="origin_time"):
     if (not all_taxa_have_attribute(phylogeny, attribute)):
         raise Exception(f"Not all taxa have '{attribute}' data")
 
