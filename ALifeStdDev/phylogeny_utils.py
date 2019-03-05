@@ -180,7 +180,7 @@ def get_extant_taxa_ids(phylogeny, time="present", not_destroyed_value="none",
 
 
 def get_extant_taxa(phylogeny, time="present", not_destroyed_value="none",
-                    destruction_attribute="destruction_time", 
+                    destruction_attribute="destruction_time",
                     origin_attribute="origin_time"):
     """
     Get extant taxa from a phylogeny
