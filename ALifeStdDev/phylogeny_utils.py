@@ -67,7 +67,7 @@ def get_roots(phylogeny):
 
     Returns:
         For all nodes in phylogeny, return dictionary of root nodes (nodes with no predecessors).
-        The returned dictionary is keyed by
+        The returned dictionary is keyed by node ids.
         Each node in the returned list is a dictionary with all of the node's descriptors/attributes.
     """
     roots = {node:phylogeny.nodes[node] for node in phylogeny.nodes if len(list(phylogeny.predecessors(node))) == 0}
@@ -113,45 +113,76 @@ def get_leaf_taxa(phylogeny):
         phylogeny (networkx.DiGraph): graph object that describes a phylogeny
 
     Returns:
-
+        Returns dictionary of leaf taxa nodes.
+        The returned dictionary is keyed by node ids.
+        Each node in the returned list is a dictionary with all of the node's descriptors/attributes.
     """
     extant = {node:phylogeny.nodes[node] for node in phylogeny.nodes if len(list(phylogeny.successors(node))) == 0}
     for e in extant: extant[e]["id"] = e
     return extant
 
 def get_leaf_taxa_ids(phylogeny):
-    """
-    given a phylogeny, return ids of extant taxa
+    """Given a phylogeny, return list of leaf taxa (taxa with no successors/descendants)
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        For all nodes in phylogeny, return ids of nodes with no successors (descendants).
     """
     extant_ids = [node for node in phylogeny.nodes if len(list(phylogeny.successors(node))) == 0]
     return extant_ids
 
-def get_extant_taxa_ids(phylogeny, not_destroyed_value="none"):
-    """
-    given a phylogeny, return ids of extant taxa (i.e., taxa where destruction_time is equal
-    to given not_destroyed_value)
+def get_extant_taxa_ids(phylogeny, not_destroyed_value="none", attribute="destruction_time"):
+    """Get ids of extant taxa from a phylogeny
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        not_destroyed_value (str): value of taxa[attribute] that indicates that
+            the taxa is not destroyed (i.e., still exists)
+        attribute (str): attribute to use to determine if taxa still exists
+
+    Returns:
+        List of extant taxa ids.
     """
     # Check if all taxa have destruction time attribute
-    if (not all_taxa_have_attribute(phylogeny, "destruction_time")): raise Exception(f"Not all taxa have 'destruction_time' attribute")
-    extant_ids = [node for node in phylogeny.nodes if phylogeny.nodes[node]["destruction_time"]==not_destroyed_value]
+    if (not all_taxa_have_attribute(phylogeny, attribute)): raise Exception(f"Not all taxa have '{attribute}' data")
+    extant_ids = [node for node in phylogeny.nodes if phylogeny.nodes[node][attribute]==not_destroyed_value]
     return extant_ids
 
-def get_extant_taxa(phylogeny, not_destroyed_value="none"):
-    """
-    given a phylogeny, return extant population details (as a dictionary) indexed
-    by id
+def get_extant_taxa(phylogeny, not_destroyed_value="none", attribute="destruction_time"):
+    """Get extant taxa from a phylogeny
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        not_destroyed_value (str): value of taxa[attribute] that indicates that
+            the taxa is not destroyed (i.e., still exists)
+        attribute (str): attribute to use to determine if taxa still exists
+
+    Returns:
+        Returns dictionary of extant taxa.
+        The returned dictionary is keyed by node ids.
+        Each node in the returned list is a dictionary with all of the node's descriptors/attributes.
     """
     # Check if all taxa have destruction time attribute
-    if (not all_taxa_have_attribute(phylogeny, "destruction_time")): raise Exception(f"Not all taxa have 'destruction_time' attribute")
-    extant = {node:phylogeny.nodes[node] for node in phylogeny.nodes if phylogeny.nodes[node]["destruction_time"]==not_destroyed_value}
+    if (not all_taxa_have_attribute(phylogeny, attribute)): raise Exception(f"Not all taxa have '{attribute}' data")
+    extant = {node:phylogeny.nodes[node] for node in phylogeny.nodes if phylogeny.nodes[node][attribute]==not_destroyed_value}
     for e in extant: extant[e]["id"] = e
     return extant
 
 # ===== Extracting lineages =====
 
 def extract_asexual_lineage(phylogeny, taxa_id):
-    """
-    Given a phylogeny, extract lineage of given id
+    """Given a phylogeny, extract the ancestral lineage of the taxa specified by
+    taxa_id. Only works for asexual phylogenies.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        taxa_id (int): id of taxa to extract an ancestral lineage for (must be
+            a valid node id in the given phylogeny).
+
+    Returns:
+        networkx.DiGraph that contains the ancestral lineage of the specified taxa.
     """
     # Make sure taxa id is in the phylogeny
     if not taxa_id in phylogeny.nodes: raise Exception(f"Failed to find given taxa ({taxa_id}) in phylogeny")
