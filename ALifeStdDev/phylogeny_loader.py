@@ -51,5 +51,5 @@ def load_phylogeny_to_networkx(filename):
 
             except ValueError:  # Handle special values
                 phylogeny.nodes[taxon_id]["origin"] = ancestor
-    print(phylogeny.nodes)
+
     return phylogeny
