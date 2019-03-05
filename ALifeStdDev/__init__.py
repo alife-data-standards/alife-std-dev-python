@@ -1,2 +1,2 @@
 from .phylogeny_loader import *
-import phylogeny_utils
+import .phylogeny_utils as phylo
