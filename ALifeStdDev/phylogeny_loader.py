@@ -33,6 +33,10 @@ def load_phylogeny_to_networkx(filename):
     # Add nodes
     for taxon_id in data.index:
         phylogeny.add_node(taxon_id)
+        for col in data:
+            if col == "id":
+                continue
+            phylogeny.nodes[taxon_id][col] = data.loc[taxon_id, col]
 
     # Add edges
     for taxon_id in data.index:
@@ -47,5 +51,5 @@ def load_phylogeny_to_networkx(filename):
 
             except ValueError:  # Handle special values
                 phylogeny.nodes[taxon_id]["origin"] = ancestor
-
+    print(phylogeny.nodes)
     return phylogeny
