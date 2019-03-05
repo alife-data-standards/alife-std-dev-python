@@ -106,6 +106,7 @@ def get_independent_phylogenies(phylogeny):
 
 # ===== Extracting the extant taxa =====
 
+
 def get_leaf_taxa(phylogeny):
     """Get the leaf taxa (taxa with no successors/descendants) of the given phylogeny.
 
@@ -119,6 +120,7 @@ def get_leaf_taxa(phylogeny):
     for e in extant: extant[e]["id"] = e
     return extant
 
+
 def get_leaf_taxa_ids(phylogeny):
     """
     given a phylogeny, return ids of extant taxa
@@ -126,26 +128,61 @@ def get_leaf_taxa_ids(phylogeny):
     extant_ids = [node for node in phylogeny.nodes if len(list(phylogeny.successors(node))) == 0]
     return extant_ids
 
-def get_extant_taxa_ids(phylogeny, not_destroyed_value="none"):
+
+def get_extant_taxa_ids(phylogeny, time="present", not_destroyed_value="none"):
     """
-    given a phylogeny, return ids of extant taxa (i.e., taxa where destruction_time is equal
-    to given not_destroyed_value)
+    given a phylogeny, return ids of extant taxa (i.e., taxa where 
+    destruction_time is equal to given not_destroyed_value)
     """
     # Check if all taxa have destruction time attribute
-    if (not all_taxa_have_attribute(phylogeny, "destruction_time")): raise Exception(f"Not all taxa have 'destruction_time' attribute")
-    extant_ids = [node for node in phylogeny.nodes if phylogeny.nodes[node]["destruction_time"]==not_destroyed_value]
+    validate_destruction_time(phylogeny)
+
+    # Check if all taxa have origin time attribute
+    if (time != "present"):
+        validate_origin_time(phylogeny)
+
+    extant_ids = [node for node in phylogeny.nodes
+                  if taxon_is_alive(phylogeny.nodes[node],
+                                    time, not_destroyed_value)]
     return extant_ids
 
-def get_extant_taxa(phylogeny, not_destroyed_value="none"):
+
+def get_extant_taxa(phylogeny, time="present", not_destroyed_value="none"):
     """
-    given a phylogeny, return extant population details (as a dictionary) indexed
-    by id
+    given a phylogeny, return extant population details (as a dictionary)
+    indexed by id
     """
     # Check if all taxa have destruction time attribute
-    if (not all_taxa_have_attribute(phylogeny, "destruction_time")): raise Exception(f"Not all taxa have 'destruction_time' attribute")
-    extant = {node:phylogeny.nodes[node] for node in phylogeny.nodes if phylogeny.nodes[node]["destruction_time"]==not_destroyed_value}
-    for e in extant: extant[e]["id"] = e
+    validate_destruction_time(phylogeny)
+
+    # Check if all taxa have origin time attribute
+    if (time != "present"):
+        validate_origin_time(phylogeny)
+
+    extant = {node: phylogeny.nodes[node] for node in phylogeny.nodes
+              if taxon_is_alive(phylogeny.nodes[node],
+                                time, not_destroyed_value)}
+    for e in extant:
+        extant[e]["id"] = e
     return extant
+
+
+def taxon_is_alive(node, time, not_destroyed_value="none"):
+    return (node["destruction_time"] == not_destroyed_value  # not dead yet
+            or node["destruction_time"] > time) \
+            and (time == "present" or
+                 node["origin_time"] < time)  # has been born
+
+
+def validate_destruction_time(phylogeny):
+    if (not all_taxa_have_attribute(phylogeny, "destruction_time")):
+        raise Exception(f"Not all taxa have 'destruction_time' attribute")
+
+
+def validate_origin_time(phylogeny):
+    if (not all_taxa_have_attribute(phylogeny, "origin_time")):
+        raise Exception(f"Not all taxa have 'origin_time' attribute")
+
 
 # ===== Extracting lineages =====
 
