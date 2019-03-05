@@ -75,16 +75,28 @@ def get_roots(phylogeny):
     return roots
 
 def get_num_roots(phylogeny):
-    """Given a phylogeny (that may contain multiple roots), return number of roots.
-
-    This function is a wrapper around networkx's number_weekly_connected_components
-    function.
+    """Given a phylogeny (that may contain multiple roots), return number of roots
+    where a root is a node with no predecessors.
 
     Args:
         phylogeny (networkx.DiGraph): graph object that describes a phylogeny
 
     Returns:
         Returns the number of independent trees (i.e., roots) in the given phylogeny.
+    """
+    return len(get_root_ids(phylogeny))
+
+def get_num_independent_phylogenies(phylogeny):
+    """Get number of the independently-rooted trees within the given phylogeny.
+
+    This function wraps networkx's number_weakly_connected_components function.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        Returns the number of weakly connected components (independent trees) in
+        the given phylogeny.
     """
     return nx.number_weakly_connected_components(phylogeny)
 
