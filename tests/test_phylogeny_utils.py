@@ -187,11 +187,11 @@ def test_get_extant_taxa():
     pruned_phylo = alsd.load_phylogeny_to_networkx(pruned_fname)
     unpruned_phylo = alsd.load_phylogeny_to_networkx(unpruned_fname)
 
-    pruned_extant = phylo.get_extant_taxa_ids(pruned_phylo)
-    unpruned_extant = phylo.get_extant_taxa_ids(unpruned_phylo)
+    pruned_extant = phylo.get_extant_taxa(pruned_phylo)
+    unpruned_extant = phylo.get_extant_taxa(unpruned_phylo)
 
-    assert set(pruned_extant) == set([3,4,5])
-    assert set(unpruned_extant) == set([3,4,5])
+    assert set(pruned_extant.keys()) == set([3,4,5])
+    assert set(unpruned_extant.keys()) == set([3,4,5])
 
 def test_extract_asexual_lineage():
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
