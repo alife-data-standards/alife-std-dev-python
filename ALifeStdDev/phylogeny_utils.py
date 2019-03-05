@@ -35,46 +35,85 @@ def is_asexual(phylogeny):
 # ===== Rootedness-related utilities =====
 
 def has_single_root(phylogeny):
-    """
-    Given phylogeny, return True if it has only a single root and False if it has
+    """Given phylogeny, return True if it has only a single root and False if it has
     mulitple roots.
-    (wrapper around nx.is_connected)
+
+    This function just wraps the networkx is_weekly_connected function.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        True if it has only a single root and False if it has mulitple roots.
     """
     return nx.is_weakly_connected(phylogeny)
 
 def get_root_ids(phylogeny):
-    """
-    get root ids of phylogeny
+    """Get ids of root nodes in phylogeny
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        For all nodes in phylogeny, return ids of nodes with no predecessors.
     """
     return [node for node in phylogeny.nodes if len(list(phylogeny.predecessors(node))) == 0]
 
 def get_roots(phylogeny):
+    """Get root nodes in phylogeny (does not assume that the given phylogeny has a single root).
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        For all nodes in phylogeny, return dictionary of root nodes (nodes with no predecessors).
+        The returned dictionary is keyed by
+        Each node in the returned list is a dictionary with all of the node's descriptors/attributes.
+    """
     roots = {node:phylogeny.nodes[node] for node in phylogeny.nodes if len(list(phylogeny.predecessors(node))) == 0}
     for r in roots: roots[r]["id"] = r
     return roots
 
 def get_num_roots(phylogeny):
-    """
-    Given a phylogeny (that may contain multiple roots), return number of roots.
+    """Given a phylogeny (that may contain multiple roots), return number of roots.
+
+    This function is a wrapper around networkx's number_weekly_connected_components
+    function.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        Returns the number of independent trees (i.e., roots) in the given phylogeny.
     """
     return nx.number_weakly_connected_components(phylogeny)
 
 def get_independent_phylogenies(phylogeny):
-    """
-    Given phylogeny (that may contain multiple roots), return independently rooted phylogenies
-    (deep copy)
+    """Get a list of the independently-rooted trees within the given phylogeny.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        Returns a list of networkx.DiGraph objects.
+        Each member of the returned list is an independent (not connected) subgraph
+        of the given phylogeny. The returned list of networkx.DiGraph objects are
+        copies.
     """
     components = [c for c in sorted(nx.weakly_connected_components(phylogeny), key=len, reverse=True)]
-    # print("Components: {}".format(components))
     phylogenies = [phylogeny.subgraph(comp).copy() for comp in components]
     return phylogenies
 
 # ===== Extracting the extant taxa =====
 
 def get_leaf_taxa(phylogeny):
-    """
-    given a phylogeny, return extant population details (as a dictionary) indexed
-    by id
+    """Get the leaf taxa (taxa with no successors/descendants) of the given phylogeny.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+
     """
     extant = {node:phylogeny.nodes[node] for node in phylogeny.nodes if len(list(phylogeny.successors(node))) == 0}
     for e in extant: extant[e]["id"] = e
