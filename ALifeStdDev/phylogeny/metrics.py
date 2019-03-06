@@ -7,6 +7,11 @@ def get_asexual_lineage_length(lineage):
 
     Will check that given lineage is an asexual lineage.
 
+    Args:
+        lineage (networkx.DiGraph): an asexual lineage
+
+    Returns:
+        length (int) of given lineage
     """
     if not utils.is_asexual_lineage(lineage): raise Exception("the given lineage is not an asexual lineage")
     return len(lineage.nodes)
@@ -16,9 +21,13 @@ def get_asexual_lineage_num_discrete_state_changes(lineage, attribute_list):
 
     State is described by the aggregation of all attributes give by attribute list.
 
-    Args: todo
+    Args:
+        lineage (networkx.DiGraph): an asexual lineage
+        attribute_list (list): list of attributes (strings) to use when defining
+            a state
 
-    Returns: todo
+    Returns:
+        Returns the number of discrete states along the lineage.
     """
     # Check that lineage is an asexual lineage.
     if not utils.is_asexual_lineage(lineage): raise Exception("the given lineage is not an asexual lineage")
@@ -40,7 +49,16 @@ def get_asexual_lineage_num_discrete_state_changes(lineage, attribute_list):
     return num_states
 
 def get_asexual_lineage_num_discrete_unique_states(lineage, attribute_list):
-    """
+    """Get the number of discrete unique states along a lineage where what it
+    means to be a state is defined by attribute_list.
+
+    Args:
+        lineage (networkx.DiGraph): an asexual lineage
+        attribute_list (list): list of attributes (strings) to use when defining
+            a state
+
+    Returns:
+        The number of discrete unique states found along the lineage.
     """
     # Check that lineage is an asexual lineage.
     if not utils.is_asexual_lineage(lineage): raise Exception("the given lineage is not an asexual lineage")
@@ -58,7 +76,18 @@ def get_asexual_lineage_num_discrete_unique_states(lineage, attribute_list):
     return len(unique_states)
 
 def get_asexual_lineage_mutation_accumulation(lineage, mutation_attributes, skip_root=False):
-    """
+    """Get the distribution of mutation type accumulations over an asexual lineage.
+
+    Args:
+        lineage (networkx.DiGraph): an asexual lineage
+        mutation_attributes (list of str): what are the mutation count attributes
+            that we should accumulate over the lineage?
+        skip_root (bool): Should we include root node mutation count values in
+            our accumlation? Defaults to false.
+
+    Returns:
+        A dictionary indexed by mutation types (mutation_attributes) where each
+        value in the dictionary is the sum of that type of mutation along the lineage.
     """
     # Check that lineage is an asexual lineage.
     if not utils.is_asexual_lineage(lineage): raise Exception("the given lineage is not an asexual lineage")
@@ -83,6 +112,9 @@ def get_asexual_lineage_mutation_accumulation(lineage, mutation_attributes, skip
 # ===== asexual phylogeny metrics =====
 
 def get_mrca_tree_depth_asexual(phylogeny, ids=None):
+    """Get the tree depth of the most recent common ancestor shared by the specified
+    taxa ids (ids) in an asexual phylogeny (phylogeny).
+    """
     # Get the id of the most recent common ancestor
     mrca_id = utils.get_mrca_id_asexual(phylogeny, ids)
     if mrca_id == -1: raise Exception("phylogeny has no common ancestor")
