@@ -314,7 +314,18 @@ def extract_asexual_lineage_ids(phylogeny, taxa_id):
 
 def abstract_asexual_lineage(lineage, attribute_list, origin_time_attr="origin_time", destruction_time_attr="destruction_time"):
     """Given an asexual lineage, abstract as sequence of states where state-ness
-    is described by attributes.
+    is described by attributes. I.e., compress the lineage into a sequence of states.
+
+    Args:
+        lineage (networkx.DiGraph): an asexual lineage
+        attribute_list (list of strings): a list of attributes to use to define
+            taxa state
+        origin_time_attr (str): attribute key for origin_time of a taxa
+        destruction_time_attr (str): attribute key for destruction time of a taxa
+
+    Returns:
+        networkx.DiGraph objects that describes an abstracted version of the given
+        lineage.
     """
     # Check that lineage is an asexual lineage.
     if not is_asexual_lineage(lineage): raise Exception("the given lineage is not an asexual lineage")
@@ -383,6 +394,8 @@ def abstract_asexual_lineage(lineage, attribute_list, origin_time_attr="origin_t
 # ===== mrca =====
 
 def has_common_ancestor_asexual(phylogeny, ids=None):
+    """Do the given set of ids share a common ancestor in the given phylogeny?
+    """
     # check that phylogeny is asexual
     if not is_asexual(phylogeny): raise Exception("given phylogeny is not asexual")
     # if given no ids, default to leaf taxa; otherwise, validate given ids
@@ -407,6 +420,9 @@ def has_common_ancestor_asexual(phylogeny, ids=None):
     else: return False # No common ancestors
 
 def get_mrca_id_asexual(phylogeny, ids=None):
+    """Get the id of the most recent common ancestor (mrca) shared among taxa specified
+    by ids. Returns -1 if no mrca exists.
+    """
     # check that phylogeny is asexual
     if not is_asexual(phylogeny): raise Exception("given phylogeny is not asexual")
     # if given no ids, default to leaf taxa; otherwise, validate given ids
@@ -443,6 +459,9 @@ def get_mrca_id_asexual(phylogeny, ids=None):
     return cur_taxa
 
 def get_mrca_asexual(phylogeny, ids=None):
+    """Get the most recent common ancestor (mrca) shared among taxa specified
+    by ids. Returns None if no mrca exists.
+    """
     if has_common_ancestor_asexual(phylogeny, ids):
         mrca_id = get_mrca_id_asexual(phylogeny, ids)
         mrca = phylogeny.nodes[mrca_id]
