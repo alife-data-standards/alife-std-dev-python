@@ -41,8 +41,34 @@ def test_get_asexual_lineage_mutation_accumulation():
     with pytest.raises(Exception):
         mut_dist = phylodev.get_asexual_lineage_mutation_accumulation(lineage, mutation_attributes=["garbage_attribute_that_nothing_should_have"])
 
+def test_get_mrca_tree_depth():
+    single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot)
+    assert depth == 0
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot, [3,4,5])
+    assert depth == 0
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot, [3,4])
+    assert depth == 1
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot, [5,0])
+    assert depth == 0
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot, [0,1,2,3,4,5])
+    assert depth == 0
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot, [2])
+    assert depth == 1
+
+    depth = phylodev.get_mrca_tree_depth_asexual(sroot, [5])
+    assert depth == 2
+
 if __name__ == "__main__":
     test_get_asexual_lineage_length()
     test_get_asexual_lineage_num_discrete_state_changes()
     test_get_asexual_lineage_num_discrete_unique_states()
     test_get_asexual_lineage_mutation_accumulation()
+    test_get_mrca_tree_depth()

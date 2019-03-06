@@ -244,6 +244,51 @@ def test_abstract_asexual_lineage():
     abstract_lineage_tb = phylodev.abstract_asexual_lineage(lineage, ["trait_b"])
     assert len(abstract_lineage_tb) == 2
 
+def test_get_mrca_id_asexual():
+    single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
+    multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
+
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+
+    mrca_id = phylodev.get_mrca_id_asexual(sroot)
+    assert mrca_id == 0
+
+    mrca_id = phylodev.get_mrca_id_asexual(sroot, [3,4,5])
+    assert mrca_id == 0
+
+    mrca_id = phylodev.get_mrca_id_asexual(sroot, [3,4])
+    assert mrca_id == 1
+
+    mrca_id = phylodev.get_mrca_id_asexual(sroot, [5,0])
+    assert mrca_id == 0
+
+    mrca_id = phylodev.get_mrca_id_asexual(sroot, [0,1,2,3,4,5])
+    assert mrca_id == 0
+
+    mrca_id = phylodev.get_mrca_id_asexual(sroot, [2])
+    assert mrca_id == 2
+
+    mrca_id = phylodev.get_mrca_id_asexual(mroot)
+    assert mrca_id == -1
+
+    mrca_id = phylodev.get_mrca_id_asexual(mroot, [8, 8])
+    assert mrca_id == 8
+
+    mrca_id = phylodev.get_mrca_id_asexual(mroot, [7, 8])
+    assert mrca_id == 7
+
+    mrca_id = phylodev.get_mrca_id_asexual(mroot, [6,8])
+    assert mrca_id == 6
+
+def test_has_common_ancestor_asexual():
+    single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
+    multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    assert phylodev.has_common_ancestor_asexual(sroot)
+    assert not phylodev.has_common_ancestor_asexual(mroot)
+
 if __name__ == "__main__":
     test_all_taxa_have_attribute()
     test_is_asexual()
@@ -259,3 +304,5 @@ if __name__ == "__main__":
     test_extract_asexual_lineage()
     test_is_asexual_lineage()
     test_abstract_asexual_lineage()
+    test_get_mrca_id_asexual()
+    test_has_common_ancestor_asexual()

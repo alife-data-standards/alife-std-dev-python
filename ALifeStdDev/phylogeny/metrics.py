@@ -79,3 +79,19 @@ def get_asexual_lineage_mutation_accumulation(lineage, mutation_attributes, skip
         for mut_attr in mutation_attributes:
             mut_accumulators[mut_attr] += lineage.nodes[lineage_id][mut_attr]
     return mut_accumulators
+
+# ===== asexual phylogeny metrics =====
+
+def get_mrca_tree_depth_asexual(phylogeny, ids=None):
+    # Get the id of the most recent common ancestor
+    mrca_id = utils.get_mrca_id_asexual(phylogeny, ids)
+    if mrca_id == -1: raise Exception("phylogeny has no common ancestor")
+    # Calculate distance from root to mrca
+    cur_id = mrca_id
+    depth = 0
+    while True:
+        ancestor_ids = list(phylogeny.predecessors(cur_id))
+        if len(ancestor_ids) == 0: break
+        depth+=1
+        cur_id = ancestor_ids[0]
+    return depth

@@ -287,6 +287,20 @@ def extract_asexual_lineage(phylogeny, taxa_id):
     Returns:
         networkx.DiGraph that contains the ancestral lineage of the specified taxa.
     """
+    return phylogeny.subgraph(extract_asexual_lineage_ids(phylogeny, taxa_id)).copy()
+
+def extract_asexual_lineage_ids(phylogeny, taxa_id):
+    """Given a phylogeny, extract the ids of the members of the ancestral lineage
+        of the taxa specified by taxa_id. Only works for asexual phylogenies.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        taxa_id (int): id of taxa to extract an ancestral lineage for (must be
+            a valid node id in the given phylogeny).
+
+    Returns:
+        List of ids along specified taxa's lineage.
+    """
     # Make sure taxa id is in the phylogeny
     if not taxa_id in phylogeny.nodes: raise Exception(f"Failed to find given taxa ({taxa_id}) in phylogeny")
     if not is_asexual(phylogeny): raise Exception("Given phylogeny is not asexual")
@@ -296,7 +310,7 @@ def extract_asexual_lineage(phylogeny, taxa_id):
         ancestor_ids = list(phylogeny.predecessors(ids_on_lineage[-1]))
         if len(ancestor_ids) == 0: break
         ids_on_lineage.append(ancestor_ids[0])
-    return phylogeny.subgraph(ids_on_lineage).copy()
+    return ids_on_lineage
 
 def abstract_asexual_lineage(lineage, attribute_list, origin_time_attr="origin_time", destruction_time_attr="destruction_time"):
     """Given an asexual lineage, abstract as sequence of states where state-ness
@@ -365,3 +379,74 @@ def abstract_asexual_lineage(lineage, attribute_list, origin_time_attr="origin_t
             abstract_lineage.nodes[state_id]["members"] = {lineage_id:lineage.nodes[lineage_id]}
 
     return abstract_lineage
+
+# ===== mrca =====
+
+def has_common_ancestor_asexual(phylogeny, ids=None):
+    # check that phylogeny is asexual
+    if not is_asexual(phylogeny): raise Exception("given phylogeny is not asexual")
+    # if given no ids, default to leaf taxa; otherwise, validate given ids
+    if ids == None:
+        # Find MRCA on leaf nodes
+        ids = get_leaf_taxa_ids(phylogeny)
+    else:
+        # Check validity of ids
+        ids = list(set(ids)) # eliminate duplicates
+        for i in ids:
+            if not i in phylogeny.nodes: raise Exception(f"failed to find {i} in phylogeny")
+
+    # Check for case where all ids are the same (return that id) and the case where we have no ids (return -1)
+    if len(set(ids)) == 1: return True
+    elif len(ids) == 0: return False
+
+    # Get the lineages of each taxa
+    lineages = [set(extract_asexual_lineage_ids(phylogeny,i)) for i in ids]
+    common_ancestors = set.intersection(*lineages)
+
+    if len(common_ancestors) > 0: return True
+    else: return False # No common ancestors
+
+def get_mrca_id_asexual(phylogeny, ids=None):
+    # check that phylogeny is asexual
+    if not is_asexual(phylogeny): raise Exception("given phylogeny is not asexual")
+    # if given no ids, default to leaf taxa; otherwise, validate given ids
+    if ids == None:
+        # Find MRCA on leaf nodes
+        ids = get_leaf_taxa_ids(phylogeny)
+    else:
+        # Check validity of ids
+        ids = list(set(ids)) # eliminate duplicates
+        for i in ids:
+            if not i in phylogeny.nodes: raise Exception(f"failed to find {i} in phylogeny")
+
+    # Check for case where all ids are the same (return that id) and the case where we have no ids (return -1)
+    if len(set(ids)) == 1: return ids[0]
+    elif len(ids) == 0: return -1
+
+    # Get the lineages of each taxa
+    lineages = [set(extract_asexual_lineage_ids(phylogeny,i)) for i in ids]
+    common_ancestors = set.intersection(*lineages)
+
+    if len(common_ancestors) == 1: return list(common_ancestors)[0]
+    elif len(common_ancestors) == 0: return -1 # No common ancestors
+
+    # Multiple common ancestors, need to figure out which is most recent.
+    # - We can assume that there _is_ a common ancestor, so we know we're working
+    #   with a single tree.
+    # The most recent common ancestor will be the ancestor most closely related
+    # to any of the given ids.
+    cur_taxa = ids[0]
+    while True:
+        # There are multiple common ancestors, which means each lineage length is > 1, so this [0] should never fail.
+        if cur_taxa in common_ancestors: break
+        cur_taxa = list(phylogeny.predecessors(cur_taxa))[0]
+    return cur_taxa
+
+def get_mrca_asexual(phylogeny, ids=None):
+    if has_common_ancestor_asexual(phylogeny, ids):
+        mrca_id = get_mrca_id_asexual(phylogeny, ids)
+        mrca = phylogeny.nodes[mrca_id]
+        mrca["id"] = mrca_id
+        return mrca
+    else:
+        return None
