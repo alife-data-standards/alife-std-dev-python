@@ -215,6 +215,21 @@ def test_extract_asexual_lineage():
     with pytest.raises(Exception):
         phylodev.extract_asexual_lineage(mroot, -99999)
 
+def test_is_asexual_lineage():
+    multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
+    sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
+
+    # check lineage of 5 8
+    lineage_5 = phylodev.extract_asexual_lineage(mroot, 5)
+    lineage_8 = phylodev.extract_asexual_lineage(mroot, 8)
+
+    assert phylodev.is_asexual_lineage(lineage_5)
+    assert phylodev.is_asexual_lineage(lineage_8)
+    assert not phylodev.is_asexual_lineage(mroot)
+    assert not phylodev.is_asexual_lineage(sexphylo)
+
 if __name__ == "__main__":
     test_all_taxa_have_attribute()
     test_is_asexual()
@@ -228,3 +243,4 @@ if __name__ == "__main__":
     test_get_extant_taxa_ids()
     test_get_extant_taxa()
     test_extract_asexual_lineage()
+    test_is_asexual_lineage()

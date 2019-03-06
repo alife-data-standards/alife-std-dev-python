@@ -32,6 +32,30 @@ def is_asexual(phylogeny):
         if len(list(phylogeny.predecessors(node))) > 1: return False
     return True
 
+def is_asexual_lineage(phylogeny):
+    """Does this phylogeny give an asexual lineage?
+
+    To be an asexual lineage, all internal nodes in the phylogeny have exactly
+    one predecessor and exactly one successor.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+
+    Returns:
+        True if the phylogeny is an asexual lineage and False otherwise.
+    """
+    lineage_ids = get_root_ids(phylogeny)
+    # There should only be a single root if the given phylogeny is a single, asexual
+    # lineage
+    if len(lineage_ids) != 1: return False
+
+    while True:
+        successor_ids = list(phylogeny.successors(lineage_ids[-1]))
+        if len(successor_ids) > 1: return False
+        if len(successor_ids) == 0: break
+        lineage_ids.append(successor_ids[0])
+    return True
+
 # ===== Rootedness-related utilities =====
 
 def has_single_root(phylogeny):
