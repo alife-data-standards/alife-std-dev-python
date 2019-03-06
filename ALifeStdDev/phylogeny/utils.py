@@ -16,6 +16,22 @@ def all_taxa_have_attribute(phylogeny, attribute):
         if not (attribute in phylogeny.nodes[node]): return False
     return True
 
+def all_taxa_have_attributes(phylogeny, attribute_list):
+    """Do all taxa in the given phylogeny have the given attributes?
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        attribute (str): a list of attributes to check for in given phylogeny
+
+    Returns:
+        True if all taxa (nodes) in the phylogeny have the all of the given attributes and False
+        otherwise.
+    """
+    for node in phylogeny.nodes:
+        for attribute in attribute_list:
+            if not (attribute in phylogeny.nodes[node]): return False
+    return True
+
 def is_asexual(phylogeny):
     """Is this an asexual phylogeny?
 
@@ -48,7 +64,6 @@ def is_asexual_lineage(phylogeny):
     # There should only be a single root if the given phylogeny is a single, asexual
     # lineage
     if len(lineage_ids) != 1: return False
-
     while True:
         successor_ids = list(phylogeny.successors(lineage_ids[-1]))
         if len(successor_ids) > 1: return False
@@ -258,7 +273,7 @@ def validate_origin_time(phylogeny, attribute="origin_time"):
         raise Exception(f"Not all taxa have '{attribute}' data")
 
 
-# ===== Extracting lineages =====
+# ===== lineages-specific utilities =====
 
 def extract_asexual_lineage(phylogeny, taxa_id):
     """Given a phylogeny, extract the ancestral lineage of the taxa specified by
@@ -282,3 +297,71 @@ def extract_asexual_lineage(phylogeny, taxa_id):
         if len(ancestor_ids) == 0: break
         ids_on_lineage.append(ancestor_ids[0])
     return phylogeny.subgraph(ids_on_lineage).copy()
+
+def abstract_asexual_lineage(lineage, attribute_list, origin_time_attr="origin_time", destruction_time_attr="destruction_time"):
+    """Given an asexual lineage, abstract as sequence of states where state-ness
+    is described by attributes.
+    """
+    # Check that lineage is an asexual lineage.
+    if not is_asexual_lineage(lineage): raise Exception("the given lineage is not an asexual lineage")
+    # Check that all nodes have all given attributes in the attribute list
+    if not all_taxa_have_attributes(lineage, attribute_list): raise Exception("given attributes are not universal among all taxa along the lineage")
+    # Make sure we prevent collisions between given attributes and attributes that are used to document states
+    if "node_state" in attribute_list:
+        raise Exception("'node_state' is a reserved attribute when using this function")
+    if "members" in attribute_list:
+        raise Exception("'members' is a reserved attribute when using this function")
+    if "state_id" in attribute_list:
+        raise Exception("'state_id' is a reserved attribute when using this function")
+
+    track_origin = all_taxa_have_attribute(lineage, origin_time_attr)
+    track_destruction = all_taxa_have_attribute(lineage, destruction_time_attr)
+
+    abstract_lineage = nx.DiGraph() # Empty graph to hold our abstract lineage.
+
+    # Start with the root node (to qualify as a lineage, graph must only have one root id)
+    root_id = get_root_ids(lineage)[0]
+    state_id = 0
+    # Add the first lineage state to the abstract lineage
+    abstract_lineage.add_node(state_id)
+    abstract_lineage.nodes[state_id]["state_id"] = state_id
+    abstract_lineage.nodes[state_id]["node_state"] = [lineage.nodes[root_id][attr] for attr in attribute_list]
+    # Add attributes to state
+    for attr in attribute_list:
+        abstract_lineage.nodes[state_id][attr] = lineage.nodes[root_id][attr]
+    if track_origin:
+        abstract_lineage.nodes[state_id]["origin_time"] = lineage.nodes[root_id][origin_time_attr]
+    if track_destruction: # (this might get updated as we go)
+        abstract_lineage.nodes[state_id]["destruction_time"] = lineage.nodes[root_id][destruction_time_attr]
+    # Add first member
+    abstract_lineage.nodes[state_id]["members"] = {root_id:lineage.nodes[root_id]}
+
+    lineage_id = root_id
+    while True:
+        successor_ids = list(lineage.successors(lineage_id))
+        if len(successor_ids) == 0: break # We've hit the last thing!
+        # Is this a new state or a member of the current state?
+        lineage_id = successor_ids[0]
+        state = [lineage.nodes[lineage_id][attr] for attr in attribute_list]
+        if abstract_lineage.nodes[state_id]["node_state"] == state:
+            # Add this taxa as member of current state
+            # - update time of destruction etc
+            abstract_lineage.nodes[state_id]["members"][lineage_id] = lineage.nodes[lineage_id]
+            if track_destruction:
+                abstract_lineage.nodes[state_id]["destruction_time"] = lineage.nodes[lineage_id][destruction_time_attr]
+        else:
+            # Add new state
+            state_id += 1
+            abstract_lineage.add_node(state_id)
+            abstract_lineage.add_edge(state_id-1, state_id)
+            # Document state information
+            abstract_lineage.nodes[state_id]["state_id"] = state_id
+            abstract_lineage.nodes[state_id]["node_state"] = [lineage.nodes[lineage_id][attr] for attr in attribute_list]
+            if track_origin:
+                abstract_lineage.nodes[state_id]["origin_time"] = lineage.nodes[lineage_id][origin_time_attr]
+            for attr in attribute_list:
+                abstract_lineage.nodes[state_id][attr] = lineage.nodes[lineage_id][attr]
+            # Add first member
+            abstract_lineage.nodes[state_id]["members"] = {lineage_id:lineage.nodes[lineage_id]}
+
+    return abstract_lineage

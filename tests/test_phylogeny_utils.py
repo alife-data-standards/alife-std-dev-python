@@ -230,6 +230,20 @@ def test_is_asexual_lineage():
     assert not phylodev.is_asexual_lineage(mroot)
     assert not phylodev.is_asexual_lineage(sexphylo)
 
+def test_abstract_asexual_lineage():
+    toy_lineage_fname = "example_data/example-standard-toy-asexual-lineage.csv"
+    lineage = phylodev.load_phylogeny_to_networkx(toy_lineage_fname)
+
+    # Abstract lineage by genotype
+    abstract_lineage_genotype = phylodev.abstract_asexual_lineage(lineage, ["genotype"])
+    assert len(abstract_lineage_genotype.nodes) == 4
+    # Abstract lineage by phenotype
+    abstract_lineage_phenotype = phylodev.abstract_asexual_lineage(lineage, ["trait_a","trait_b"])
+    assert len(abstract_lineage_phenotype) == 3
+    # Abstract lineage by trait_b
+    abstract_lineage_tb = phylodev.abstract_asexual_lineage(lineage, ["trait_b"])
+    assert len(abstract_lineage_tb) == 2
+
 if __name__ == "__main__":
     test_all_taxa_have_attribute()
     test_is_asexual()
@@ -244,3 +258,4 @@ if __name__ == "__main__":
     test_get_extant_taxa()
     test_extract_asexual_lineage()
     test_is_asexual_lineage()
+    test_abstract_asexual_lineage()
