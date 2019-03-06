@@ -1,9 +1,9 @@
-import ALifeStdDev as alsd
+import ALifeStdDev.phylogeny as phylodev
 import pytest
 
 
 def test_load_phylogeny_to_networkx():
-    phylo = alsd.load_phylogeny_to_networkx(
+    phylo = phylodev.load_phylogeny_to_networkx(
         "example_data/asexual_phylogeny_test.csv")
 
     assert phylo.has_node(36210211)
@@ -15,9 +15,9 @@ def test_load_phylogeny_to_networkx():
 
 
 def test_load_phylogeny_to_networkx_json_and_csv():
-    phylo_json = alsd.load_phylogeny_to_networkx(
+    phylo_json = phylodev.load_phylogeny_to_networkx(
         "example_data/example-standard-asexual-phylogeny.json")
-    phylo_csv = alsd.load_phylogeny_to_networkx(
+    phylo_csv = phylodev.load_phylogeny_to_networkx(
         "example_data/example-standard-asexual-phylogeny.csv")
 
     assert set(phylo_csv.nodes) == set(phylo_json.nodes)
@@ -26,7 +26,7 @@ def test_load_phylogeny_to_networkx_json_and_csv():
 
 def test_failure():
     with pytest.raises(Exception):
-        alsd.load_phylogeny_to_networkx("example_data/should_fail.csv")
+        phylodev.load_phylogeny_to_networkx("example_data/should_fail.csv")
 
 
 if __name__ == "__main__":

@@ -1,51 +1,50 @@
-import ALifeStdDev as alsd
-from ALifeStdDev import phylogeny_utils as phylo
+import ALifeStdDev.phylogeny as phylodev
 import pytest
 
 def test_all_taxa_have_attribute():
     fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
-    phylogeny = alsd.load_phylogeny_to_networkx(fname)
+    phylogeny = phylodev.load_phylogeny_to_networkx(fname)
     # assert that all nodes have the 'trait1' atttribute
-    assert phylo.all_taxa_have_attribute(phylogeny, "trait_a")
-    assert phylo.all_taxa_have_attribute(phylogeny, "trait_b")
-    assert phylo.all_taxa_have_attribute(phylogeny, "trait_c")
+    assert phylodev.all_taxa_have_attribute(phylogeny, "trait_a")
+    assert phylodev.all_taxa_have_attribute(phylogeny, "trait_b")
+    assert phylodev.all_taxa_have_attribute(phylogeny, "trait_c")
     # assert that all nodes do not have some garbage attributes (that they shouldn't
     # have)
-    assert not phylo.all_taxa_have_attribute(phylogeny, "nothing_should_have_this_garbage_test_trait")
+    assert not phylodev.all_taxa_have_attribute(phylogeny, "nothing_should_have_this_garbage_test_trait")
 
 def test_is_asexual():
     asex_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
 
-    asex_phylogeny = alsd.load_phylogeny_to_networkx(asex_fname)
-    sex_phylogeny = alsd.load_phylogeny_to_networkx(sex_fname)
+    asex_phylogeny = phylodev.load_phylogeny_to_networkx(asex_fname)
+    sex_phylogeny = phylodev.load_phylogeny_to_networkx(sex_fname)
 
     # assert that asexual phylogeny is asexual
-    assert phylo.is_asexual(asex_phylogeny)
-    assert not phylo.is_asexual(sex_phylogeny)
+    assert phylodev.is_asexual(asex_phylogeny)
+    assert not phylodev.is_asexual(sex_phylogeny)
 
 def test_has_single_root():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
 
     # (1) assert true when there is a single root
-    assert phylo.has_single_root(sroot)
+    assert phylodev.has_single_root(sroot)
     # (2) assert false when there are multiple roots
-    assert not phylo.has_single_root(mroot)
+    assert not phylodev.has_single_root(mroot)
 
 def test_get_root_ids():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    sroot_ids = phylo.get_root_ids(sroot)
-    mroot_ids = phylo.get_root_ids(mroot)
-    sexroot_ids = phylo.get_root_ids(sexphylo)
+    sroot_ids = phylodev.get_root_ids(sroot)
+    mroot_ids = phylodev.get_root_ids(mroot)
+    sexroot_ids = phylodev.get_root_ids(sexphylo)
 
     assert len(sroot_ids) == 1
     assert 0 in sroot_ids
@@ -61,13 +60,13 @@ def test_get_roots():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    sroots = phylo.get_roots(sroot)
-    mroots = phylo.get_roots(mroot)
-    sexroots = phylo.get_roots(sexphylo)
+    sroots = phylodev.get_roots(sroot)
+    mroots = phylodev.get_roots(mroot)
+    sexroots = phylodev.get_roots(sexphylo)
 
     assert len(sroots) == 1
     assert 0 in sroots
@@ -85,37 +84,37 @@ def test_get_num_roots():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    assert phylo.get_num_roots(sroot) == 1
-    assert phylo.get_num_roots(mroot) == 2
-    assert phylo.get_num_roots(sexphylo) == 2
+    assert phylodev.get_num_roots(sroot) == 1
+    assert phylodev.get_num_roots(mroot) == 2
+    assert phylodev.get_num_roots(sexphylo) == 2
 
 def test_get_num_independent_phylogenies():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    assert phylo.get_num_independent_phylogenies(sroot) == 1
-    assert phylo.get_num_independent_phylogenies(mroot) == 2
-    assert phylo.get_num_independent_phylogenies(sexphylo) == 1
+    assert phylodev.get_num_independent_phylogenies(sroot) == 1
+    assert phylodev.get_num_independent_phylogenies(mroot) == 2
+    assert phylodev.get_num_independent_phylogenies(sexphylo) == 1
 
 def test_get_independent_phylogenies():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    sroot_indies = phylo.get_independent_phylogenies(sroot)
-    mroot_indies = phylo.get_independent_phylogenies(mroot)
-    sexphylo_indies = phylo.get_independent_phylogenies(sexphylo)
+    sroot_indies = phylodev.get_independent_phylogenies(sroot)
+    mroot_indies = phylodev.get_independent_phylogenies(mroot)
+    sexphylo_indies = phylodev.get_independent_phylogenies(sexphylo)
 
     assert len(sroot_indies) == 1
     assert sroot_indies[0].nodes == sroot.nodes
@@ -131,13 +130,13 @@ def test_get_leaf_taxa():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    sroot_leafs = phylo.get_leaf_taxa(sroot)
-    mroot_leafs = phylo.get_leaf_taxa(mroot)
-    sexphylo_leafs = phylo.get_leaf_taxa(sexphylo)
+    sroot_leafs = phylodev.get_leaf_taxa(sroot)
+    mroot_leafs = phylodev.get_leaf_taxa(mroot)
+    sexphylo_leafs = phylodev.get_leaf_taxa(sexphylo)
 
     assert len(sroot_leafs) == 3
     assert set(sroot_leafs.keys()) == set([3,4,5])
@@ -152,13 +151,13 @@ def test_get_leaf_taxa_ids():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    sroot = alsd.load_phylogeny_to_networkx(single_root_fname)
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
-    sroot_leafs = phylo.get_leaf_taxa_ids(sroot)
-    mroot_leafs = phylo.get_leaf_taxa_ids(mroot)
-    sexphylo_leafs = phylo.get_leaf_taxa_ids(sexphylo)
+    sroot_leafs = phylodev.get_leaf_taxa_ids(sroot)
+    mroot_leafs = phylodev.get_leaf_taxa_ids(mroot)
+    sexphylo_leafs = phylodev.get_leaf_taxa_ids(sexphylo)
 
     assert len(sroot_leafs) == 3
     assert set(sroot_leafs) == set([3,4,5])
@@ -172,11 +171,11 @@ def test_get_leaf_taxa_ids():
 def test_get_extant_taxa_ids():
     pruned_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     unpruned_fname = "example_data/example-standard-toy-asexual-phylogeny-not-pruned.csv"
-    pruned_phylo = alsd.load_phylogeny_to_networkx(pruned_fname)
-    unpruned_phylo = alsd.load_phylogeny_to_networkx(unpruned_fname)
+    pruned_phylo = phylodev.load_phylogeny_to_networkx(pruned_fname)
+    unpruned_phylo = phylodev.load_phylogeny_to_networkx(unpruned_fname)
 
-    pruned_extant = phylo.get_extant_taxa_ids(pruned_phylo)
-    unpruned_extant = phylo.get_extant_taxa_ids(unpruned_phylo)
+    pruned_extant = phylodev.get_extant_taxa_ids(pruned_phylo)
+    unpruned_extant = phylodev.get_extant_taxa_ids(unpruned_phylo)
 
     assert set(pruned_extant) == set([3,4,5])
     assert set(unpruned_extant) == set([3,4,5])
@@ -184,11 +183,11 @@ def test_get_extant_taxa_ids():
 def test_get_extant_taxa():
     pruned_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     unpruned_fname = "example_data/example-standard-toy-asexual-phylogeny-not-pruned.csv"
-    pruned_phylo = alsd.load_phylogeny_to_networkx(pruned_fname)
-    unpruned_phylo = alsd.load_phylogeny_to_networkx(unpruned_fname)
+    pruned_phylo = phylodev.load_phylogeny_to_networkx(pruned_fname)
+    unpruned_phylo = phylodev.load_phylogeny_to_networkx(unpruned_fname)
 
-    pruned_extant = phylo.get_extant_taxa(pruned_phylo)
-    unpruned_extant = phylo.get_extant_taxa(unpruned_phylo)
+    pruned_extant = phylodev.get_extant_taxa(pruned_phylo)
+    unpruned_extant = phylodev.get_extant_taxa(unpruned_phylo)
 
     assert set(pruned_extant.keys()) == set([3,4,5])
     assert set(unpruned_extant.keys()) == set([3,4,5])
@@ -196,12 +195,12 @@ def test_get_extant_taxa():
 def test_extract_asexual_lineage():
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
     sex_fname =  "example_data/example-standard-toy-sexual-phylogeny.csv"
-    mroot = alsd.load_phylogeny_to_networkx(multi_root_fname)
-    sexphylo = alsd.load_phylogeny_to_networkx(sex_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
 
     # check lineage of 5 8
-    lineage_5 = phylo.extract_asexual_lineage(mroot, 5)
-    lineage_8 = phylo.extract_asexual_lineage(mroot, 8)
+    lineage_5 = phylodev.extract_asexual_lineage(mroot, 5)
+    lineage_8 = phylodev.extract_asexual_lineage(mroot, 8)
 
     assert len(lineage_5.nodes) == 3
     assert set(lineage_5.nodes) == set([0,2,5])
@@ -210,11 +209,11 @@ def test_extract_asexual_lineage():
 
     # make sure sexphylo fails
     with pytest.raises(Exception):
-        phylo.extract_asexual_lineage(sexphylo, 5)
+        phylodev.extract_asexual_lineage(sexphylo, 5)
 
     # make sure that invalid taxa id fails
     with pytest.raises(Exception):
-        phylo.extract_asexual_lineage(mroot, -99999)
+        phylodev.extract_asexual_lineage(mroot, -99999)
 
 if __name__ == "__main__":
     test_all_taxa_have_attribute()
