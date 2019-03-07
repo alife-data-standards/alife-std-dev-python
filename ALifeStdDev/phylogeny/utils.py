@@ -316,9 +316,10 @@ def taxon_is_alive(node, time, not_destroyed_value="none",
                    destruction_attribute="destruction_time",
                    origin_attribute="origin_time"):
     return (node["destruction_time"] == not_destroyed_value  # not dead yet
-            or node[destruction_attribute] > time) \
+            or (time != "present" and
+                float(node[destruction_attribute]) > time)) \
             and (time == "present" or
-                 node[origin_attribute] < time)  # has been born
+                 float(node[origin_attribute]) <= time)  # has been born
 
 
 def validate_destruction_time(phylogeny, attribute="destruction_time"):
