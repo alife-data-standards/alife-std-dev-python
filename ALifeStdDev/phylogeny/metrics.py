@@ -1,3 +1,4 @@
+import networkx as nx
 from . import utils
 
 # ===== asexual lineage metrics =====
@@ -127,3 +128,41 @@ def get_mrca_tree_depth_asexual(phylogeny, ids=None):
         depth+=1
         cur_id = ancestor_ids[0]
     return depth
+
+# ===== phylogenetic richness =====
+
+def calc_phylogenetic_diversity_asexual(phylogeny, ids=None):
+    """Calculate phylogenetic diversity (i.e., the number of nodes in the minimum
+    spanning tree from the MRCA to all extant taxa). Currently only for asexual
+    phylogenies.
+
+    (Faith, 1992)
+
+    ids gives the set we want to calculate phylogenetic diversity on. i.e.,
+    we'll get the mrca for those ids and compute the minimum spanning tree
+
+    none defaults to including all leaf nodes
+    """
+    # if given no ids, default to leaf taxa; otherwise, validate given ids
+    if ids == None:
+        # Find MRCA on leaf nodes
+        ids = utils.get_leaf_taxa_ids(phylogeny)
+    # (1) get the mrca
+    mrca_id = utils.get_mrca_id_asexual(phylogeny, ids)
+    if mrca_id == -1: raise Exception("given ids have no common ancestor")
+    # (2) collect paths from each id to mrca
+    canopy = set([i for i in ids] + [mrca_id])
+    for i in ids:
+        cur_id = i
+        while True:
+            ancestor_ids = list(phylogeny.predecessors(cur_id))
+            if len(ancestor_ids) == 0: break
+            cur_id = ancestor_ids[0]
+            # If we've encountered this path before, we can skip the rest because
+            # we're guaranteed an asexual phylogeny.
+            if cur_id in canopy: break
+            canopy.add(cur_id)
+    # Build a subgraph with only the canopy
+    canopy_phylo = nx.subgraph(phylogeny, list(canopy))
+    # Okay, now we can compute the minimum spanning tree.
+    return len(nx.minimum_spanning_tree(canopy_phylo.to_undirected()).nodes)

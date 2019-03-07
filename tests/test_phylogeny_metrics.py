@@ -66,9 +66,18 @@ def test_get_mrca_tree_depth():
     depth = phylodev.get_mrca_tree_depth_asexual(sroot, [5])
     assert depth == 2
 
+def test_calc_phylogenetic_diversity_asexual():
+    single_root_fname = "example_data/example-standard-toy-asexual-phylogeny-not-pruned.csv"
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    diversity = phylodev.calc_phylogenetic_diversity_asexual(sroot, [3,4,5])
+    assert diversity == 6
+    diversity = phylodev.calc_phylogenetic_diversity_asexual(sroot, [3,4,5,8])
+    assert diversity == 7
+
 if __name__ == "__main__":
     test_get_asexual_lineage_length()
     test_get_asexual_lineage_num_discrete_state_changes()
     test_get_asexual_lineage_num_discrete_unique_states()
     test_get_asexual_lineage_mutation_accumulation()
     test_get_mrca_tree_depth()
+    test_calc_phylogenetic_diversity_asexual()
