@@ -469,3 +469,21 @@ def get_mrca_asexual(phylogeny, ids=None):
         return mrca
     else:
         return None
+
+# ===== miscellaneous =====
+
+def get_pairwise_distances(phylogeny, ids):
+    """
+    given phylogeny and some ids to compute the pairwise distances between, return
+    pairwise distances
+
+    Raises:
+        networkx.exception.NetworkXNoPath: if no path between any two of the given ids
+    """
+    dists = []
+    undirected_phylo = phylogeny.to_undirected()
+    for i in range(0, len(ids)):
+        for j in range(i+1, len(ids)):
+            dists.append(nx.shortest_path_length(undirected_phylo, source=ids[i], target=ids[j]))
+            # print(f"Dist between: {ids[i]}-{ids[j]} = {dists[-1]}")
+    return dists

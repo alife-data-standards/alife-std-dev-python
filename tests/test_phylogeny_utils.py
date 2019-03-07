@@ -1,5 +1,6 @@
 import ALifeStdDev.phylogeny as phylodev
 import pytest
+import networkx as nx
 
 def test_all_taxa_have_attribute():
     fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
@@ -289,6 +290,15 @@ def test_has_common_ancestor_asexual():
     assert phylodev.has_common_ancestor_asexual(sroot)
     assert not phylodev.has_common_ancestor_asexual(mroot)
 
+def test_get_pairwise_distances():
+    single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
+    multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    assert set([2,4,4]) == set(phylodev.get_pairwise_distances(sroot, [3,4,5]))
+    with pytest.raises(nx.NetworkXNoPath):
+        phylodev.get_pairwise_distances(mroot, [3,4,8])
+
 if __name__ == "__main__":
     test_all_taxa_have_attribute()
     test_is_asexual()
@@ -306,3 +316,4 @@ if __name__ == "__main__":
     test_abstract_asexual_lineage()
     test_get_mrca_id_asexual()
     test_has_common_ancestor_asexual()
+    test_get_pairwise_distances()
