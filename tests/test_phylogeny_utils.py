@@ -213,6 +213,8 @@ def test_get_extant_at_time():
     # Should raise exception because no origin_time
     with pytest.raises(Exception):
         phylodev.get_extant_taxa_ids(pruned_phylo, time=1)
+    with pytest.raises(Exception):
+        phylodev.get_extant_taxa(pruned_phylo, time=1)
 
     extant = phylodev.get_extant_taxa_ids(pruned_phylo, time=0,
                                           origin_attribute="trait_a")
@@ -223,6 +225,14 @@ def test_get_extant_at_time():
     extant = phylodev.get_extant_taxa_ids(pruned_phylo, time=2,
                                           origin_attribute="trait_a")
     assert set(extant) == set([3, 4, 5])
+
+
+def test_validate_destruction_time():
+    g = nx.DiGraph()
+    g.add_node("A")
+
+    with pytest.raises(Exception):
+        phylodev.validate_destruction_time(g)
 
 
 def test_extract_asexual_lineage():
