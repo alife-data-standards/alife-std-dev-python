@@ -476,6 +476,37 @@ def abstract_asexual_lineage(lineage, attribute_list,
 
     return abstract_lineage
 
+# ===== lod ====
+
+def extract_asexual_lod(phylogeny):
+    """Given an asexual phylogeny, extract a line of descent (i.e. an unbroken li￼neage from a leaf node to a root)
+        Not guaranteed to be the only line of descent! It chooses the maximal valued leaf and minimal valued root.
+
+    Args:
+        phylogeny (networkx.DiGraph): graph object that describes a phylogeny
+        
+
+    Returns:
+        networkx.DiGraph object that describes a lineage
+    """
+
+    # Check that the lineage is asexual
+    if not is_asexual(phylogeny):
+      raise Exception("Given phylogeny is not asexual.")
+
+    if not get_extant_taxa_ids(phylogeny):
+      raise Exception("Given phylogeny has no extant taxa.")
+
+    # Get all leafs and roots
+    extant_taxa_ids = sorted(get_extant_taxa_ids(phylogeny), reverse=True)
+    root_ids = sorted(get_root_ids(phylogeny))
+
+    # Iterate through leaf/root pairs until we find a connected pair
+    for taxa_id in extant_taxa_ids:
+      for root_id in root_ids:
+        if nx.has_path(phylogeny, root_id, taxa_id):
+          return extract_asexual_lineage(phylogeny, taxa_id)
+    raise Exception("No path found.") 
 
 # ===== mrca =====
 

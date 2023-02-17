@@ -292,6 +292,34 @@ def test_abstract_asexual_lineage():
     abstract_lineage_tb = phylodev.abstract_asexual_lineage(lineage, ["trait_b"])
     assert len(abstract_lineage_tb) == 2
 
+def test_extract_asexual_lod():
+    single_lineage_fname = "example_data/example-standard-toy-asexual-lineage.csv"
+    single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
+    multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
+    sex_fname = "example_data/example-standard-toy-sexual-phylogeny.csv"
+    
+    lineage = phylodev.load_phylogeny_to_networkx(single_lineage_fname)
+    sroot = phylodev.load_phylogeny_to_networkx(single_root_fname)
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    sexphylo = phylodev.load_phylogeny_to_networkx(sex_fname)
+
+    # check lod for a branching lineage
+    sroot_lod = phylodev.extract_asexual_lod(sroot)
+    assert len(sroot_lod.nodes) == 3
+    assert set(sroot_lod.nodes) == set([5, 2, 0])
+
+    # check lod for a multiroot lineage 
+    mroot_lod = phylodev.extract_asexual_lod(mroot)
+    assert len(mroot_lod.nodes) == 3
+    assert set(mroot_lod.nodes) == set([8, 7, 6])
+
+    # make sure something without living taxa fails
+    with pytest.raises(Exception):
+        phylodev.extract_asexual_lod(lineage)
+
+    # make sure sexphylo fails
+    with pytest.raises(Exception):
+        phylodev.extract_asexual_lod(sexphylo)
 
 def test_get_mrca_id_asexual():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
@@ -366,6 +394,7 @@ if __name__ == "__main__":
     test_extract_asexual_lineage()
     test_is_asexual_lineage()
     test_abstract_asexual_lineage()
+    test_extract_asexual_lod()
     test_get_mrca_id_asexual()
     test_has_common_ancestor_asexual()
     test_get_pairwise_distances()
