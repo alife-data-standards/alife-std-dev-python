@@ -68,7 +68,7 @@ def networkx_to_pandas_df(g, bonus_cols=None):
     if bonus_cols is None:
         bonus_cols = {}
     df = pd.DataFrame()
-    df["id"] = g.nodes
+    df["id"] = g.nodes.keys()
     df["ancestor_list"] = [list(g.predecessors(i)) for i in df["id"]]
     for name1, name2 in bonus_cols.items():
         df[name1] = [g.nodes[i][name2] for i in df["id"]]
