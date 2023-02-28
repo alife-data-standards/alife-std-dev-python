@@ -29,5 +29,16 @@ def test_failure():
         phylodev.load_phylogeny_to_networkx("example_data/should_fail.csv")
 
 
+def test_networkx_to_pandas():
+    phylo = phylodev.load_phylogeny_to_networkx(
+        "example_data/asexual_phylogeny_test.csv")
+    df = phylodev.networkx_to_pandas_df(phylo, {"origin_time": "origin_time",
+                                                "gestation": "gest_time"})
+    assert df.loc[36205979, "origin_time"] == 199977
+    assert df.loc[36205979, "gestation"] == 0
+    assert df.loc[36205979, "ancestor_list"] == [36204695]
+
+
 if __name__ == "__main__":
     test_load_phylogeny_to_networkx()
+    test_networkx_to_pandas()

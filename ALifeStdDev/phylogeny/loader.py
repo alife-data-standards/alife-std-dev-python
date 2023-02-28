@@ -64,7 +64,9 @@ def pandas_df_to_networkx(data):
     return phylogeny
 
 
-def networkx_to_pandas_df(g, bonus_cols={}):
+def networkx_to_pandas_df(g, bonus_cols=None):
+    if bonus_cols is None:
+        bonus_cols = {}
     df = pd.DataFrame()
     df["id"] = g.nodes
     df["ancestor_list"] = [list(g.predecessors(i)) for i in df["id"]]
