@@ -1,8 +1,6 @@
 import ALifeStdDev.phylogeny as phylodev
 import pytest
 import networkx as nx
-import matplotlib.pyplot as plt
-
 
 def test_all_taxa_have_attribute():
     fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
@@ -311,8 +309,6 @@ def test_abstract_asexual_phylogeny():
     assert len(abstract_phylogeny_tb) == 2
 
     abstract_phylogeny_all = phylodev.abstract_asexual_phylogeny(phylogeny, ["trait_a", "trait_b", "trait_c"])
-    nx.draw(abstract_phylogeny_all)
-    plt.savefig("test.png")
     assert len(abstract_phylogeny_all) == 4
 
 
