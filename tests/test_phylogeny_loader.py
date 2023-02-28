@@ -39,6 +39,10 @@ def test_networkx_to_pandas():
     assert df.loc[36205979, "gestation"] == 0
     assert df.loc[36205979, "ancestor_list"] == [36204695]
 
+    df = phylodev.networkx_to_pandas_df(phylo)
+    df.set_index("id", inplace=True)
+    assert df.loc[36205979, "ancestor_list"] == [36204695]
+
 
 if __name__ == "__main__":
     test_load_phylogeny_to_networkx()
