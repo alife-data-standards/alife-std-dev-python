@@ -1,6 +1,7 @@
 import ALifeStdDev.phylogeny as phylodev
 import pytest
 import networkx as nx
+import matplotlib.pyplot as plt
 
 
 def test_all_taxa_have_attribute():
@@ -291,6 +292,29 @@ def test_abstract_asexual_lineage():
     # Abstract lineage by trait_b
     abstract_lineage_tb = phylodev.abstract_asexual_lineage(lineage, ["trait_b"])
     assert len(abstract_lineage_tb) == 2
+
+def test_abstract_asexual_phylogeny():
+    toy_phylogeny_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
+    phylogeny = phylodev.load_phylogeny_to_networkx(toy_phylogeny_fname)
+
+    # Abstract phylogeny by genotype
+    abstract_phylogeny_a = phylodev.abstract_asexual_phylogeny(phylogeny,
+                                                                  ["trait_a"])
+    assert len(abstract_phylogeny_a.nodes) == 2
+    # Abstract phylogeny by phenotype
+    abstract_phylogeny_phenotype = phylodev.abstract_asexual_phylogeny(phylogeny,
+                                                                   ["trait_a",
+                                                                    "trait_b"])
+    assert len(abstract_phylogeny_phenotype) == 3
+    # Abstract phylogeny by trait_b
+    abstract_phylogeny_tb = phylodev.abstract_asexual_phylogeny(phylogeny, ["trait_b"])
+    assert len(abstract_phylogeny_tb) == 2
+
+    abstract_phylogeny_all = phylodev.abstract_asexual_phylogeny(phylogeny, ["trait_a", "trait_b", "trait_c"])
+    nx.draw(abstract_phylogeny_all)
+    plt.savefig("test.png")
+    assert len(abstract_phylogeny_all) == 4
+
 
 def test_extract_asexual_lod():
     single_lineage_fname = "example_data/example-standard-toy-asexual-lineage.csv"

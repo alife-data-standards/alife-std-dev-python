@@ -476,6 +476,127 @@ def abstract_asexual_lineage(lineage, attribute_list,
 
     return abstract_lineage
 
+def abstract_asexual_phylogeny(phylogeny, attribute_list,
+                             origin_time_attr="origin_time",
+                             destruction_time_attr="destruction_time"):
+    """Given an asexual phylogeny, abstract as sequence of states where state-ness
+    is described by attributes. I.e., compress the phylogeny into a sequence of
+    states.
+
+    Args:
+        phylogeny (networkx.DiGraph): an asexual phylogeny
+        attribute_list (list of strings): a list of attributes to use to define
+            taxa state
+        origin_time_attr (str): attribute key for origin_time of a taxa
+        destruction_time_attr (str): attribute key for destruction time of a
+                                     taxa
+
+    Returns:
+        networkx.DiGraph objects that describes an abstracted version of the
+        given phylogeny.
+    """
+    # Check that phylogeny is an asexual phylogeny.
+    if not is_asexual(phylogeny):
+        raise Exception("the given phylogeny is not an asexual phylogeny")
+    # Check that all nodes have all given attributes in the attribute list
+    if not all_taxa_have_attributes(phylogeny, attribute_list):
+        raise Exception("given attributes are not universal among all taxa along the phylogeny")
+    # Make sure we prevent collisions between given attributes and attributes
+    # that are used to document states
+    if "node_state" in attribute_list:
+        raise Exception("'node_state' is a reserved attribute when using this function")
+    if "members" in attribute_list:
+        raise Exception("'members' is a reserved attribute when using this function")
+    if "state_id" in attribute_list:
+        raise Exception("'state_id' is a reserved attribute when using this function")
+
+    track_origin = all_taxa_have_attribute(phylogeny, origin_time_attr)
+    track_destruction = all_taxa_have_attribute(phylogeny, destruction_time_attr)
+
+    abstract_phylogeny = nx.DiGraph()  # Empty graph to hold abstract phylogeny.
+
+    # Start with the root nodes
+    # TODO: Make work for forests (multiple roots)
+    root_id = get_root_ids(phylogeny)[0]
+    state_id = 0
+    # Add the first phylogeny state to the abstract phylogeny
+    abstract_phylogeny.add_node(state_id)
+    abstract_phylogeny.nodes[state_id]["state_id"] = state_id
+    abstract_phylogeny.nodes[state_id]["node_state"] = \
+        [phylogeny.nodes[root_id][attr] for attr in attribute_list]
+    # Add attributes to state
+    for attr in attribute_list:
+        abstract_phylogeny.nodes[state_id][attr] = phylogeny.nodes[root_id][attr]
+    if track_origin:
+        abstract_phylogeny.nodes[state_id]["origin_time"] = \
+            phylogeny.nodes[root_id][origin_time_attr]
+    if track_destruction:  # (this might get updated as we go)
+        dest_time = phylogeny.nodes[root_id][destruction_time_attr]
+        if dest_time == "none" or float(dest_time) == float("inf"):
+            dest_time = -1
+        dest_time = float(dest_time)
+        abstract_phylogeny.nodes[state_id]["destruction_time"] = dest_time
+
+    # Add first member
+    abstract_phylogeny.nodes[state_id]["members"] = {root_id:
+                                                   phylogeny.nodes[root_id]}
+
+    next_id = state_id + 1
+
+    def abstract_recur(phylogeny_id, state_id):
+        nonlocal next_id
+        successor_ids = list(phylogeny.successors(phylogeny_id))
+        if len(successor_ids) == 0:
+            return  # We've hit a leaf node!
+        for id in successor_ids:
+            # Is this a new state or a member of the current state?
+            state = [phylogeny.nodes[id][attr] for attr in attribute_list]
+            if abstract_phylogeny.nodes[state_id]["node_state"] == state:
+                next_state_id = state_id
+                # Add this taxa as member of current state
+                # - update time of destruction etc
+                abstract_phylogeny.nodes[state_id]["members"][id] = \
+                    phylogeny.nodes[id]
+                if track_destruction:
+                    dest_time = phylogeny.nodes[id][destruction_time_attr]
+                    if dest_time == "none" or float(dest_time) == float("inf"):
+                        dest_time = -1
+                    dest_time = float(dest_time)
+                    dest_time = max(dest_time, abstract_phylogeny.nodes[state_id]["destruction_time"])
+                    abstract_phylogeny.nodes[state_id]["destruction_time"] = dest_time
+            else:
+                # Add new state
+                next_state_id = next_id
+                next_id += 1
+                abstract_phylogeny.add_node(next_state_id)
+                abstract_phylogeny.add_edge(state_id, next_state_id)
+                # Document state information
+                abstract_phylogeny.nodes[next_state_id]["state_id"] = next_state_id
+                abstract_phylogeny.nodes[next_state_id]["node_state"] = \
+                    [phylogeny.nodes[id][attr] for attr in attribute_list]
+                if track_origin:
+                    abstract_phylogeny.nodes[next_state_id]["origin_time"] = \
+                        phylogeny.nodes[id][origin_time_attr]
+
+                if track_destruction:
+                    dest_time = phylogeny.nodes[id][destruction_time_attr]
+                    if dest_time == "none" or float(dest_time) == float("inf"):
+                        dest_time = -1
+                    dest_time = float(dest_time)                    
+                    abstract_phylogeny.nodes[next_state_id]["destruction_time"] = dest_time
+
+                for attr in attribute_list:
+                    abstract_phylogeny.nodes[next_state_id][attr] = \
+                        phylogeny.nodes[id][attr]
+                # Add first member
+                abstract_phylogeny.nodes[next_state_id]["members"] = \
+                    {phylogeny_id: phylogeny.nodes[id]}
+            abstract_recur(id, next_state_id)
+
+    abstract_recur(root_id, state_id)
+    return abstract_phylogeny
+
+
 # ===== lod ====
 
 def extract_asexual_lod(phylogeny):
