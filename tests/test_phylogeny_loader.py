@@ -34,6 +34,7 @@ def test_networkx_to_pandas():
         "example_data/asexual_phylogeny_test.csv")
     df = phylodev.networkx_to_pandas_df(phylo, {"origin_time": "origin_time",
                                                 "gestation": "gest_time"})
+    df.set_index("id", inplace=True)
     assert df.loc[36205979, "origin_time"] == 199977
     assert df.loc[36205979, "gestation"] == 0
     assert df.loc[36205979, "ancestor_list"] == [36204695]
