@@ -542,12 +542,14 @@ def abstract_asexual_phylogeny(phylogeny, attribute_list,
                                                    phylogeny.nodes[root_id]}
 
     next_id = state_id + 1
+    to_process = [(root_id, state_id)]
 
-    def abstract_recur(phylogeny_id, state_id):
-        nonlocal next_id
+    while to_process:
+        phylogeny_id, state_id = to_process.pop()
+
         successor_ids = list(phylogeny.successors(phylogeny_id))
         if len(successor_ids) == 0:
-            return  # We've hit a leaf node!
+            continue  # We've hit a leaf node!
         for id in successor_ids:
             # Is this a new state or a member of the current state?
             state = [phylogeny.nodes[id][attr] for attr in attribute_list]
@@ -591,9 +593,8 @@ def abstract_asexual_phylogeny(phylogeny, attribute_list,
                 # Add first member
                 abstract_phylogeny.nodes[next_state_id]["members"] = \
                     {phylogeny_id: phylogeny.nodes[id]}
-            abstract_recur(id, next_state_id)
+            to_process.append((id, next_state_id))
 
-    abstract_recur(root_id, state_id)
     return abstract_phylogeny
 
 
