@@ -8,4 +8,6 @@ setup(name='ALifeStdDev',
       author_email='dolsonem@msu.edu, lalejini@msu.edu',
       license='MIT',
       packages=['ALifeStdDev'],
-zip_safe=False)
+      install_requires=['networkx', 'pandas'],
+      zip_safe=False,
+)
