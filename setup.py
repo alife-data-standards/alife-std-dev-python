@@ -21,7 +21,9 @@ setup(name='ALifeStdDev',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
+        # python 3.11 dependencies aren't compatible with 3.7
+        # wait to sunset 3.7 before formally testing for/supporting 3.11
+        # 'Programming Language :: Python :: 3.11',
       ],
       long_description=readme,
       long_description_content_type='text/markdown',
