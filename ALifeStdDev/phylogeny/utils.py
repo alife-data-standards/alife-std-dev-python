@@ -517,32 +517,36 @@ def abstract_asexual_phylogeny(phylogeny, attribute_list,
 
     # Start with the root nodes
     # TODO: Make work for forests (multiple roots)
-    root_id = get_root_ids(phylogeny)[0]
+    to_process = []
+    root_ids = get_root_ids(phylogeny)
     state_id = 0
+    next_id = 1
     # Add the first phylogeny state to the abstract phylogeny
-    abstract_phylogeny.add_node(state_id)
-    abstract_phylogeny.nodes[state_id]["state_id"] = state_id
-    abstract_phylogeny.nodes[state_id]["node_state"] = \
-        [phylogeny.nodes[root_id][attr] for attr in attribute_list]
-    # Add attributes to state
-    for attr in attribute_list:
-        abstract_phylogeny.nodes[state_id][attr] = phylogeny.nodes[root_id][attr]
-    if track_origin:
-        abstract_phylogeny.nodes[state_id]["origin_time"] = \
-            phylogeny.nodes[root_id][origin_time_attr]
-    if track_destruction:  # (this might get updated as we go)
-        dest_time = phylogeny.nodes[root_id][destruction_time_attr]
-        if dest_time == "none" or float(dest_time) == float("inf"):
-            dest_time = -1
-        dest_time = float(dest_time)
-        abstract_phylogeny.nodes[state_id]["destruction_time"] = dest_time
+    for root_id in root_ids:
+        abstract_phylogeny.add_node(state_id)
+        abstract_phylogeny.nodes[state_id]["state_id"] = state_id
+        abstract_phylogeny.nodes[state_id]["node_state"] = \
+            [phylogeny.nodes[root_id][attr] for attr in attribute_list]
+        # Add attributes to state
+        for attr in attribute_list:
+            abstract_phylogeny.nodes[state_id][attr] = phylogeny.nodes[root_id][attr]
+        if track_origin:
+            abstract_phylogeny.nodes[state_id]["origin_time"] = \
+                phylogeny.nodes[root_id][origin_time_attr]
+        if track_destruction:  # (this might get updated as we go)
+            dest_time = phylogeny.nodes[root_id][destruction_time_attr]
+            if dest_time == "none" or float(dest_time) == float("inf"):
+                dest_time = -1
+            dest_time = float(dest_time)
+            abstract_phylogeny.nodes[state_id]["destruction_time"] = dest_time
 
-    # Add first member
-    abstract_phylogeny.nodes[state_id]["members"] = {root_id:
-                                                   phylogeny.nodes[root_id]}
+        # Add first member
+        abstract_phylogeny.nodes[state_id]["members"] = {root_id:
+                                                    phylogeny.nodes[root_id]}
 
-    next_id = state_id + 1
-    to_process = [(root_id, state_id)]
+        to_process.append((root_id, state_id))
+        state_id = next_id
+        next_id += 1
 
     while to_process:
         phylogeny_id, state_id = to_process.pop()
@@ -592,7 +596,7 @@ def abstract_asexual_phylogeny(phylogeny, attribute_list,
                         phylogeny.nodes[id][attr]
                 # Add first member
                 abstract_phylogeny.nodes[next_state_id]["members"] = \
-                    {phylogeny_id: phylogeny.nodes[id]}
+                    {id: phylogeny.nodes[id]}
             to_process.append((id, next_state_id))
 
     return abstract_phylogeny
