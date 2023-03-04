@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -30,7 +30,7 @@ setup(name='ALifeStdDev',
       include_package_data=True,
       keywords='artificial life',
       test_suite='tests',
-      packages=['ALifeStdDev'],
+      packages=find_packages(include=['ALifeStdDev', 'ALifeStdDev.*']),
       install_requires=['networkx', 'pandas'],
       tests_require=['pytest'],
       zip_safe=False,
