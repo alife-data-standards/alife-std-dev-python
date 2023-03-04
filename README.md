@@ -16,3 +16,19 @@ ALifeStdDev can be installed using pip:
 ```
 pip install ALifeStdDev
 ```
+
+# Usage Instructions
+
+To load a single submodule,
+
+```python3
+from ALifeStdDev import phylogeny as asd_phylo
+asd_phylo.load_phylogeny_to_pandas_df("myfile.csv")
+```
+
+To load the library as a flat namespace,
+
+```python3
+from ALifeStdDev import ALifeStdDev as asd
+asd.load_phylogeny_to_pandas_df("myfile.csv")
+```
