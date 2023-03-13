@@ -1,5 +1,6 @@
 import ALifeStdDev.phylogeny as phylodev
 import pytest
+import pandas as pd
 
 
 def test_load_phylogeny_to_networkx():
@@ -44,6 +45,18 @@ def test_networkx_to_pandas():
     assert df.loc[36205979, "ancestor_list"] == [36204695]
 
 
+def test_pandas_to_networkx():
+    df = pd.read_csv("example_data/example-standard-toy-asexual-phylogeny.csv")
+    g = phylodev.pandas_df_to_networkx(df)
+    assert 1 in g[0]
+    assert 2 in g[0]
+    assert 3 in g[1]
+    assert 4 in g[1]
+    assert 5 in g[2]
+    assert 2 not in g[5]
+    
+
 if __name__ == "__main__":
-    test_load_phylogeny_to_networkx()
-    test_networkx_to_pandas()
+    # test_load_phylogeny_to_networkx()
+    # test_networkx_to_pandas()
+    test_pandas_to_networkx()
