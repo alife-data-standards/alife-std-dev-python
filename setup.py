@@ -1,10 +1,10 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
 setup(name='ALifeStdDev',
-      version='0.2.3',
+      version='0.2.4',
       description='Python development tools for working with standardized ALife data.',
       url='https://github.com/alife-data-standards/alife-std-dev-python',
       author='Emily Dolson, Alex Lalejini, Matthew Andres Moreno',
@@ -30,7 +30,7 @@ setup(name='ALifeStdDev',
       include_package_data=True,
       keywords='artificial life',
       test_suite='tests',
-      packages=['ALifeStdDev'],
+      packages=find_packages(include=['ALifeStdDev', 'ALifeStdDev.*']),
       install_requires=['networkx', 'pandas'],
       tests_require=['pytest'],
       zip_safe=False,
