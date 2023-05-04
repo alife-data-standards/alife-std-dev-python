@@ -291,6 +291,7 @@ def test_abstract_asexual_lineage():
     abstract_lineage_tb = phylodev.abstract_asexual_lineage(lineage, ["trait_b"])
     assert len(abstract_lineage_tb) == 2
 
+
 def test_abstract_asexual_phylogeny():
     toy_phylogeny_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     phylogeny = phylodev.load_phylogeny_to_networkx(toy_phylogeny_fname)
@@ -341,6 +342,7 @@ def test_extract_asexual_lod():
     with pytest.raises(Exception):
         phylodev.extract_asexual_lod(sexphylo)
 
+
 def test_get_mrca_id_asexual():
     single_root_fname = "example_data/example-standard-toy-asexual-phylogeny.csv"
     multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
@@ -377,6 +379,18 @@ def test_get_mrca_id_asexual():
 
     mrca_id = phylodev.get_mrca_id_asexual(mroot, [6,8])
     assert mrca_id == 6
+
+
+def test_is_ancestor_asexual():
+    multi_root_fname = "example_data/example-standard-toy-asexual-phylogeny-multi-roots.csv"
+
+    mroot = phylodev.load_phylogeny_to_networkx(multi_root_fname)
+    assert phylodev.is_ancestor_asexual(mroot, 1, 0)
+    assert not phylodev.is_ancestor_asexual(mroot, 0, 1)
+    assert not phylodev.is_ancestor_asexual(mroot, 0, 6)
+    assert not phylodev.is_ancestor_asexual(mroot, 6, 0)
+    assert phylodev.is_ancestor_asexual(mroot, 8, 6)
+    assert not phylodev.is_ancestor_asexual(mroot, 6, 8)
 
 
 def test_has_common_ancestor_asexual():

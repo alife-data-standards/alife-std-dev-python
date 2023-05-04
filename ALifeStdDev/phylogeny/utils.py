@@ -635,7 +635,7 @@ def extract_asexual_lod(phylogeny):
     raise Exception("No path found.") 
 
 
-def is_ancestor(phylogeny, tax1, tax2):
+def is_ancestor_asexual(phylogeny, tax1, tax2):
     """
     Is tax2 the ancestor of tax1?
     """
