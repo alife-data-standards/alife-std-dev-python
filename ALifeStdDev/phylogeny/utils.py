@@ -634,6 +634,23 @@ def extract_asexual_lod(phylogeny):
           return extract_asexual_lineage(phylogeny, taxa_id)
     raise Exception("No path found.") 
 
+
+def is_ancestor(phylogeny, tax1, tax2):
+    """
+    Is tax2 the ancestor of tax1?
+    """
+    curr = tax1
+    while True:
+        parent = list(phylogeny.predecessors(curr))
+        if len(parent) == 0:
+            break
+        assert len(parent) == 1
+        curr = parent[0]
+        if curr == tax2:
+            return True
+    return False
+
+
 # ===== mrca =====
 
 def has_common_ancestor_asexual(phylogeny, ids=None):

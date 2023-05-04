@@ -54,7 +54,8 @@ def test_pandas_to_networkx():
     assert 4 in g[1]
     assert 5 in g[2]
     assert 2 not in g[5]
-    
+    assert 3 not in g[0]
+
 
 if __name__ == "__main__":
     # test_load_phylogeny_to_networkx()
