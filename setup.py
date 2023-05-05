@@ -4,7 +4,7 @@ with open('README.md') as readme_file:
     readme = readme_file.read()
 
 setup(name='ALifeStdDev',
-      version='0.3.2',
+      version='0.3.3',
       description='Python development tools for working with standardized ALife data.',
       url='https://github.com/alife-data-standards/alife-std-dev-python',
       author='Emily Dolson, Alex Lalejini, Matthew Andres Moreno',
